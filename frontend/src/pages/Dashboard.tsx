@@ -29,7 +29,6 @@ export default function Dashboard() {
   const [newTxIds, setNewTxIds] = useState<Set<string>>(new Set())
   const [showAddTx, setShowAddTx] = useState(false)
   const [showAddAccount, setShowAddAccount] = useState(false)
-  const [wsConnected] = useState(true)
 
   const handleWSEvent = useCallback((event: WSEvent) => {
     if (event.type === 'transaction.created') {

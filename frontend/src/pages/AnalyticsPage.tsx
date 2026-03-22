@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
                 <PolarGrid stroke="#252534" />
                 <PolarAngleAxis
                   dataKey="subject"
-                  tick={{ fill: '#6b7280', fontSize: 10, textTransform: 'capitalize' }}
+                  tick={{ fill: '#6b7280', fontSize: 10 }}
                 />
                 <Radar
                   name="Spending"
