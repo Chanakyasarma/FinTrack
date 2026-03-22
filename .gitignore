@@ -1,0 +1,27 @@
+# Go
+backend/bin/
+backend/coverage.out
+backend/coverage.html
+backend/*.test
+backend/go.sum        # regenerate with: cd backend && go mod tidy
+
+# Env
+backend/.env
+**/.env.local
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

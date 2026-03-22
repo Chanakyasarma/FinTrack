@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #0f0f14;
+    color: #e2e2f0;
+    font-family: 'Sora', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #16161f;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #252534;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #7c6af7;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface-1 border border-surface-3 rounded-2xl p-6;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5;
+  }
+
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-dim text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface-2 text-gray-300 hover:text-white font-medium px-4 py-2 rounded-xl transition-all duration-200;
+  }
+
+  .input {
+    @apply w-full bg-surface-2 border border-surface-3 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all duration-200;
+  }
+
+  .badge-credit {
+    @apply inline-flex items-center gap-1 text-success bg-success/10 text-xs font-semibold px-2 py-1 rounded-full;
+  }
+
+  .badge-debit {
+    @apply inline-flex items-center gap-1 text-danger bg-danger/10 text-xs font-semibold px-2 py-1 rounded-full;
+  }
+
+  .stat-card {
+    @apply card-hover flex flex-col gap-3;
+  }
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2dd4a0;
+  animation: pulseDot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 212, 160, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(45, 212, 160, 0); }
+}
