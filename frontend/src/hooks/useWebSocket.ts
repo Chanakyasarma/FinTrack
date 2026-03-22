@@ -11,7 +11,10 @@ export function useWebSocket(token: string | null, onEvent: EventHandler) {
   const connect = useCallback(() => {
     if (!token || !isMounted.current) return
 
-    const wsUrl = `ws://localhost:8080/api/v1/ws`
+    const wsBase = import.meta.env.VITE_API_URL
+      ? import.meta.env.VITE_API_URL.replace('https', 'wss').replace('http', 'ws')
+      : 'ws://localhost:8080'
+    const wsUrl = `${wsBase}/api/v1/ws`
     const ws = new WebSocket(wsUrl, [])
 
     // Send token as first message after connection
