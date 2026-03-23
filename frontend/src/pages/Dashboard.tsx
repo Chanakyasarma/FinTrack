@@ -67,7 +67,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-up">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">
             Good {getGreeting()}, {user?.full_name?.split(' ')[0]} 👋
@@ -92,7 +92,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <StatCard
           title="Total Balance"
           value={formatCurrency(summary?.total_balance ?? 0)}
@@ -132,7 +132,7 @@ export default function Dashboard() {
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
             Accounts
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {acLoading
               ? Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="h-32 bg-surface-1 rounded-2xl animate-pulse border border-surface-3" />
@@ -143,9 +143,9 @@ export default function Dashboard() {
       )}
 
       {/* Charts + Transactions */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cash flow chart */}
-        <div className="col-span-2 card">
+        <div className="lg:col-span-2 card">
           <h2 className="text-sm font-semibold text-white mb-4">Cash Flow — Last 6 Months</h2>
           {trendData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
@@ -221,7 +221,7 @@ export default function Dashboard() {
 
       {/* Recent transactions */}
       <div className="card">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
           <h2 className="text-sm font-semibold text-white">Recent Transactions</h2>
           <span className="text-xs text-gray-500">Updates in real-time ⚡</span>
         </div>

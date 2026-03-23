@@ -47,7 +47,7 @@ export default function AccountsPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-36 bg-surface-1 rounded-2xl animate-pulse border border-surface-3" />
           ))}
@@ -63,7 +63,7 @@ export default function AccountsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {accounts.map((a) => (
             <AccountCard
               key={a.id}

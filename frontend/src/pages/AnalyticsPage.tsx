@@ -14,7 +14,7 @@ export default function AnalyticsPage() {
     return (
       <div className="space-y-6 animate-fade-up">
         <div className="h-8 w-48 bg-surface-2 rounded-lg animate-pulse" />
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-64 bg-surface-1 rounded-2xl animate-pulse border border-surface-3" />
           ))}
@@ -78,7 +78,7 @@ export default function AnalyticsPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Net cash flow line */}
         <div className="card">
           <div className="flex items-center gap-2 mb-5">
