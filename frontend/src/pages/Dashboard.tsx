@@ -10,7 +10,7 @@ import AddTransactionModal from '@/components/AddTransactionModal'
 import AddAccountModal from '@/components/AddAccountModal'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell,
 } from 'recharts'
 import {
   DollarSign, TrendingUp, TrendingDown, Percent, Plus, Zap,
@@ -23,7 +23,7 @@ const CHART_COLORS = ['#7c6af7', '#2dd4a0', '#f5a623', '#f2605c', '#4fc3f7', '#9
 export default function Dashboard() {
   const { user, token } = useAuth()
   const { accounts, loading: acLoading, refetch: refetchAccounts, updateBalance } = useAccounts()
-  const { transactions, loading: txLoading, refetch: refetchTx, prepend } = useTransactions(10)
+  const { transactions, refetch: refetchTx, prepend } = useTransactions(10)
   const { summary, loading: sumLoading, refetch: refetchSummary } = useSummary()
 
   const [newTxIds, setNewTxIds] = useState<Set<string>>(new Set())
