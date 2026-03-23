@@ -32,7 +32,7 @@
 
 @layer components {
   .card {
-    @apply bg-surface-1 border border-surface-3 rounded-2xl p-6;
+    @apply bg-surface-1 border border-surface-3 rounded-2xl p-4 md:p-6;
   }
 
   .card-hover {
@@ -60,7 +60,7 @@
   }
 
   .stat-card {
-    @apply card-hover flex flex-col gap-3;
+    @apply card-hover flex flex-col gap-2 md:gap-3 p-3 md:p-6;
   }
 }
 
