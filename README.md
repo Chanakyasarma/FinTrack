@@ -220,3 +220,7 @@ Backend listens for `SIGINT`/`SIGTERM` and calls `http.Server.Shutdown()` with a
 - **CSV export** — streaming export of transactions using `encoding/csv`
 - **Unit tests** — mock repositories with `testify/mock`, table-driven tests for services
 - **OpenTelemetry** — distributed tracing across handler/service/repo layers
+<img width="1918" height="992" alt="Screenshot 1" src="https://github.com/user-attachments/assets/beb07339-e2bc-492b-9570-291608bee8de" />
+<img width="1917" height="988" alt="Screenshot 2026-03-23 135019" src="https://github.com/user-attachments/assets/9a8dfc73-89f1-48fa-b195-d2e3f2748729" />
+
+
