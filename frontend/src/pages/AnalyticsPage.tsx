@@ -12,7 +12,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 animate-fade-up">
+      <div className="space-y-6 animate-fade-up pt-2 md:pt-6">
         <div className="h-8 w-48 bg-surface-2 rounded-lg animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -41,7 +41,7 @@ export default function AnalyticsPage() {
   }))
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="space-y-6 animate-fade-up pt-2 md:pt-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Analytics</h1>
         <p className="text-sm text-gray-400 mt-0.5">Detailed breakdown of your financial patterns</p>

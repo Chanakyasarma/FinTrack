@@ -65,7 +65,7 @@ export default function Dashboard() {
   const trendData = summary?.monthly_trend ?? []
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-8 animate-fade-up pt-2 md:pt-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
