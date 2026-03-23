@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useAccounts, useTransactions, useSummary } from '@/hooks/useFinance'
 import { useWebSocket } from '@/hooks/useWebSocket'
@@ -30,7 +30,16 @@ export default function Dashboard() {
   const [showAddTx, setShowAddTx] = useState(false)
   const [showAddAccount, setShowAddAccount] = useState(false)
 
-  const handleWSEvent = useCallback((event: WSEvent) => {
+  const [greeting, setGreeting] = useState(getGreeting())
+  const [currentTime, setCurrentTime] = useState(formatTime())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setGreeting(getGreeting())
+      setCurrentTime(formatTime())
+    }, 60000) // update every minute
+    return () => clearInterval(timer)
+  }, [])
     if (event.type === 'transaction.created') {
       const tx = event.payload as Transaction
       prepend(tx)
@@ -65,14 +74,19 @@ export default function Dashboard() {
   const trendData = summary?.monthly_trend ?? []
 
   return (
-    <div className="space-y-8 animate-fade-up pt-2 md:pt-6">
+    <div className="space-y-8 animate-fade-up pt-4 md:pt-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            Good {getGreeting()}, {user?.full_name?.split(' ')[0]} 👋
-          </h1>
-          <p className="text-sm text-gray-400 mt-0.5">Here's your financial overview</p>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl">{getGreetingEmoji()}</span>
+            <h1 className="text-xl md:text-2xl font-bold text-white">
+              Good {greeting}, {user?.full_name?.split(' ')[0]}!
+            </h1>
+          </div>
+          <p className="text-sm text-gray-400">
+            {currentTime} · Here's your financial overview
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-surface-3">
@@ -265,9 +279,26 @@ export default function Dashboard() {
 
 function getGreeting() {
   const h = new Date().getHours()
-  if (h < 12) return 'morning'
-  if (h < 18) return 'afternoon'
-  return 'evening'
+  if (h >= 5 && h < 12) return 'morning'
+  if (h >= 12 && h < 17) return 'afternoon'
+  if (h >= 17 && h < 21) return 'evening'
+  return 'night'
+}
+
+function getGreetingEmoji() {
+  const h = new Date().getHours()
+  if (h >= 5 && h < 12) return '🌅'
+  if (h >= 12 && h < 17) return '☀️'
+  if (h >= 17 && h < 21) return '🌆'
+  return '🌙'
+}
+
+function formatTime() {
+  return new Date().toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
 }
 
 function EmptyChart() {
