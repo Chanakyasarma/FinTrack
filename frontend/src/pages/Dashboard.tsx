@@ -33,17 +33,22 @@ export default function Dashboard() {
   const [greeting, setGreeting] = useState(getGreeting())
   const [currentTime, setCurrentTime] = useState(formatTime())
 
+  // ⏱ Live greeting + time update
   useEffect(() => {
     const timer = setInterval(() => {
       setGreeting(getGreeting())
       setCurrentTime(formatTime())
-    }, 60000) // update every minute
+    }, 60000)
     return () => clearInterval(timer)
   }, [])
+
+  // ⚡ WebSocket event handler (FIXED)
+  const handleWSEvent = useCallback((event: WSEvent) => {
     if (event.type === 'transaction.created') {
       const tx = event.payload as Transaction
       prepend(tx)
       setNewTxIds((prev) => new Set(prev).add(tx.id))
+
       setTimeout(() => {
         setNewTxIds((prev) => {
           const next = new Set(prev)
@@ -51,6 +56,7 @@ export default function Dashboard() {
           return next
         })
       }, 3000)
+
       refetchSummary()
       toast.success(`New transaction: ${formatCurrency(tx.amount)}`, { icon: '⚡' })
     } else if (event.type === 'balance.updated') {
@@ -88,16 +94,19 @@ export default function Dashboard() {
             {currentTime} · Here's your financial overview
           </p>
         </div>
+
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-surface-3">
             <div className="live-dot" />
             <span className="text-xs text-gray-400 font-medium">Live</span>
             <Zap className="w-3 h-3 text-success" />
           </div>
+
           <button onClick={() => setShowAddAccount(true)} className="btn-ghost text-sm">
             <Plus className="w-4 h-4 inline mr-1" />
             Account
           </button>
+
           <button onClick={() => setShowAddTx(true)} className="btn-primary text-sm">
             <Plus className="w-4 h-4 inline mr-1" />
             Transaction
@@ -140,7 +149,7 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Accounts row */}
+      {/* Accounts */}
       {accounts.length > 0 && (
         <div>
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -156,140 +165,68 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Charts + Transactions */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Cash flow chart */}
         <div className="lg:col-span-2 card">
           <h2 className="text-sm font-semibold text-white mb-4">Cash Flow — Last 6 Months</h2>
           {trendData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={trendData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorCredit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2dd4a0" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#2dd4a0" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorDebit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#7c6af7" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#7c6af7" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
+              <AreaChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#252534" />
-                <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
-                  labelStyle={{ color: '#e2e2f0', fontSize: 12 }}
-                  itemStyle={{ fontSize: 12 }}
-                />
-                <Area type="monotone" dataKey="total_credit" name="Income" stroke="#2dd4a0" fill="url(#colorCredit)" strokeWidth={2} dot={false} />
-                <Area type="monotone" dataKey="total_debit" name="Expenses" stroke="#7c6af7" fill="url(#colorDebit)" strokeWidth={2} dot={false} />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Area type="monotone" dataKey="total_credit" stroke="#2dd4a0" fill="#2dd4a0" />
+                <Area type="monotone" dataKey="total_debit" stroke="#7c6af7" fill="#7c6af7" />
               </AreaChart>
             </ResponsiveContainer>
-          ) : (
-            <EmptyChart />
-          )}
+          ) : <EmptyChart />}
         </div>
 
-        {/* Spending breakdown */}
         <div className="card">
           <h2 className="text-sm font-semibold text-white mb-4">Spending Breakdown</h2>
           {pieData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={80}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
+                <Pie data={pieData} dataKey="value">
                   {pieData.map((entry, index) => (
-                    <Cell
-                      key={entry.name}
-                      fill={CATEGORY_COLORS[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]}
-                    />
+                    <Cell key={entry.name} fill={CATEGORY_COLORS[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
-                  formatter={(v: number) => formatCurrency(v)}
-                  itemStyle={{ fontSize: 12 }}
-                />
-                <Legend
-                  iconType="circle"
-                  iconSize={8}
-                  formatter={(value) => (
-                    <span style={{ fontSize: 11, color: '#9ca3af', textTransform: 'capitalize' }}>{value}</span>
-                  )}
-                />
               </PieChart>
             </ResponsiveContainer>
-          ) : (
-            <EmptyChart />
-          )}
+          ) : <EmptyChart />}
         </div>
       </div>
 
-      {/* Recent transactions */}
+      {/* Transactions */}
       <div className="card">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-          <h2 className="text-sm font-semibold text-white">Recent Transactions</h2>
-          <span className="text-xs text-gray-500">Updates in real-time ⚡</span>
-        </div>
-
-        {txLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-16 bg-surface-2 rounded-xl animate-pulse" />
-            ))}
-          </div>
-        ) : transactions.length === 0 ? (
-          <p className="text-center text-gray-500 py-8 text-sm">
-            No transactions yet. Add one to get started!
-          </p>
-        ) : (
-          <div className="divide-y divide-surface-2">
-            {transactions.map((tx) => (
-              <TransactionItem key={tx.id} tx={tx} isNew={newTxIds.has(tx.id)} />
-            ))}
-          </div>
-        )}
+        {transactions.map((tx) => (
+          <TransactionItem key={tx.id} tx={tx} isNew={newTxIds.has(tx.id)} />
+        ))}
       </div>
 
       {/* Modals */}
-      {showAddTx && (
-        <AddTransactionModal
-          accounts={accounts}
-          onClose={() => setShowAddTx(false)}
-          onSuccess={handleTxSuccess}
-        />
-      )}
-      {showAddAccount && (
-        <AddAccountModal
-          onClose={() => setShowAddAccount(false)}
-          onSuccess={refetchAccounts}
-        />
-      )}
+      {showAddTx && <AddTransactionModal accounts={accounts} onClose={() => setShowAddTx(false)} onSuccess={handleTxSuccess} />}
+      {showAddAccount && <AddAccountModal onClose={() => setShowAddAccount(false)} onSuccess={refetchAccounts} />}
     </div>
   )
 }
 
+// helpers
 function getGreeting() {
   const h = new Date().getHours()
-  if (h >= 5 && h < 12) return 'morning'
-  if (h >= 12 && h < 17) return 'afternoon'
-  if (h >= 17 && h < 21) return 'evening'
+  if (h < 12) return 'morning'
+  if (h < 17) return 'afternoon'
+  if (h < 21) return 'evening'
   return 'night'
 }
 
 function getGreetingEmoji() {
   const h = new Date().getHours()
-  if (h >= 5 && h < 12) return '🌅'
-  if (h >= 12 && h < 17) return '☀️'
-  if (h >= 17 && h < 21) return '🌆'
+  if (h < 12) return '🌅'
+  if (h < 17) return '☀️'
+  if (h < 21) return '🌆'
   return '🌙'
 }
 
