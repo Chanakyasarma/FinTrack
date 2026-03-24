@@ -1,17 +1,16 @@
 import { useState } from 'react'
-import { useTransactions } from '@/hooks/useFinance'
-import { useAccounts } from '@/hooks/useFinance'
+import { useTransactions, useAccounts } from '@/hooks/useFinance'
 import TransactionItem from '@/components/TransactionItem'
 import AddTransactionModal from '@/components/AddTransactionModal'
 import { Plus, Search, Filter } from 'lucide-react'
-import { TransactionCategory } from '@/types'
+import { Transaction, TransactionCategory } from '@/types'
 
 const CATEGORIES: Array<TransactionCategory | 'all'> = [
   'all', 'food', 'transport', 'shopping', 'entertainment', 'health', 'salary', 'other',
 ]
 
 export default function TransactionsPage() {
-  const { transactions, loading, refetch } = useTransactions(50)
+  const { transactions, loading, refetch, updateOne, removeOne } = useTransactions(50)
   const { accounts, refetch: refetchAccounts } = useAccounts()
   const [showModal, setShowModal] = useState(false)
   const [search, setSearch] = useState('')
@@ -28,9 +27,19 @@ export default function TransactionsPage() {
     return matchSearch && matchCategory && matchType
   })
 
+  const handleUpdate = (updated: Transaction) => {
+    updateOne(updated)
+    refetchAccounts()
+  }
+
+  const handleDelete = (id: string) => {
+    removeOne(id)
+    refetchAccounts()
+  }
+
   return (
     <div className="space-y-6 animate-fade-up pt-2 md:pt-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Transactions</h1>
           <p className="text-sm text-gray-400 mt-0.5">{filtered.length} transactions</p>
@@ -54,8 +63,8 @@ export default function TransactionsPage() {
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <Filter className="w-4 h-4 text-gray-500" />
-          <div className="flex gap-2">
+          <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
+          <div className="flex gap-2 flex-wrap">
             {(['all', 'credit', 'debit'] as const).map((t) => (
               <button
                 key={t}
@@ -69,7 +78,7 @@ export default function TransactionsPage() {
             ))}
           </div>
 
-          <div className="w-px h-4 bg-surface-3" />
+          <div className="w-px h-4 bg-surface-3 hidden sm:block" />
 
           <div className="flex gap-2 flex-wrap">
             {CATEGORIES.map((cat) => (
@@ -104,7 +113,12 @@ export default function TransactionsPage() {
         ) : (
           <div className="divide-y divide-surface-2">
             {filtered.map((tx) => (
-              <TransactionItem key={tx.id} tx={tx} />
+              <TransactionItem
+                key={tx.id}
+                tx={tx}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}

@@ -21,6 +21,8 @@ type AccountRepository interface {
 type TransactionRepository interface {
 	Create(ctx context.Context, tx *Transaction) error
 	GetByID(ctx context.Context, id string) (*Transaction, error)
+	Update(ctx context.Context, tx *Transaction) error
+	Delete(ctx context.Context, id string) error
 	ListByUserID(ctx context.Context, userID string, limit, offset int) ([]*Transaction, error)
 	ListByAccountID(ctx context.Context, accountID string, limit, offset int) ([]*Transaction, error)
 	GetSummary(ctx context.Context, userID string, from, to time.Time) (*Summary, error)

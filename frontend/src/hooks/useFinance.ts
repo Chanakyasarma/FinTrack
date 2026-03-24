@@ -53,7 +53,15 @@ export function useTransactions(limit = 20) {
     setTransactions((prev) => [tx, ...prev.slice(0, limit - 1)])
   }, [limit])
 
-  return { transactions, loading, error, refetch: fetch, prepend }
+  const updateOne = useCallback((updated: Transaction) => {
+    setTransactions((prev) => prev.map((t) => t.id === updated.id ? updated : t))
+  }, [])
+
+  const removeOne = useCallback((id: string) => {
+    setTransactions((prev) => prev.filter((t) => t.id !== id))
+  }, [])
+
+  return { transactions, loading, error, refetch: fetch, prepend, updateOne, removeOne }
 }
 
 export function useSummary() {
