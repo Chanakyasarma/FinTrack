@@ -8,6 +8,8 @@ import (
 	"fintrack/internal/service"
 	"fintrack/pkg/middleware"
 	"fintrack/pkg/respond"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type TransactionHandler struct {
@@ -80,4 +82,51 @@ func (h *TransactionHandler) Summary(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respond.Success(w, http.StatusOK, summary)
+}
+
+func (h *TransactionHandler) Update(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+	txID := chi.URLParam(r, "id")
+
+	var input service.UpdateTransactionInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		respond.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	errs := make(map[string]string)
+	if input.Amount <= 0 {
+		errs["amount"] = "amount must be greater than 0"
+	}
+	if input.Type == "" {
+		errs["type"] = "type is required (credit or debit)"
+	}
+	if len(errs) > 0 {
+		respond.ValidationError(w, errs)
+		return
+	}
+
+	if input.Category == "" {
+		input.Category = "other"
+	}
+
+	tx, err := h.txService.Update(r.Context(), userID, txID, input)
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respond.Success(w, http.StatusOK, tx)
+}
+
+func (h *TransactionHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+	txID := chi.URLParam(r, "id")
+
+	if err := h.txService.Delete(r.Context(), userID, txID); err != nil {
+		respond.Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respond.Success(w, http.StatusOK, map[string]string{"message": "transaction deleted"})
 }

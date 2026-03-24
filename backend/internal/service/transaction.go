@@ -169,3 +169,104 @@ func txListKey(userID string) string {
 func summaryKey(userID string) string {
 	return fmt.Sprintf("summary:%s", userID)
 }
+
+type UpdateTransactionInput struct {
+	Amount       float64                    `json:"amount"`
+	Type         domain.TransactionType     `json:"type"`
+	Category     domain.TransactionCategory `json:"category"`
+	Description  string                     `json:"description"`
+	MerchantName string                     `json:"merchant_name"`
+}
+
+func (s *TransactionService) Update(ctx context.Context, userID, txID string, input UpdateTransactionInput) (*domain.Transaction, error) {
+	// Verify ownership
+	existing, err := s.txRepo.GetByID(ctx, txID)
+	if err != nil {
+		return nil, fmt.Errorf("transaction not found")
+	}
+	if existing.UserID != userID {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	// Reverse old balance effect, apply new one if amount/type changed
+	if existing.Amount != input.Amount || existing.Type != input.Type {
+		account, err := s.accountRepo.GetByID(ctx, existing.AccountID)
+		if err != nil {
+			return nil, fmt.Errorf("account not found: %w", err)
+		}
+
+		// Reverse old transaction
+		newBalance := account.Balance
+		if existing.Type == domain.TransactionTypeCredit {
+			newBalance -= existing.Amount
+		} else {
+			newBalance += existing.Amount
+		}
+
+		// Apply new transaction
+		if input.Type == domain.TransactionTypeCredit {
+			newBalance += input.Amount
+		} else {
+			newBalance -= input.Amount
+		}
+
+		if err := s.accountRepo.UpdateBalance(ctx, account.ID, newBalance); err != nil {
+			return nil, fmt.Errorf("updating balance: %w", err)
+		}
+	}
+
+	updated := &domain.Transaction{
+		ID:           txID,
+		UserID:       userID,
+		AccountID:    existing.AccountID,
+		Amount:       input.Amount,
+		Type:         input.Type,
+		Category:     input.Category,
+		Description:  input.Description,
+		MerchantName: input.MerchantName,
+		CreatedAt:    existing.CreatedAt,
+	}
+
+	if err := s.txRepo.Update(ctx, updated); err != nil {
+		return nil, fmt.Errorf("updating transaction: %w", err)
+	}
+
+	// Invalidate caches
+	s.cache.Delete(ctx, txListKey(userID), summaryKey(userID), accountListKey(userID))
+
+	return updated, nil
+}
+
+func (s *TransactionService) Delete(ctx context.Context, userID, txID string) error {
+	existing, err := s.txRepo.GetByID(ctx, txID)
+	if err != nil {
+		return fmt.Errorf("transaction not found")
+	}
+	if existing.UserID != userID {
+		return fmt.Errorf("unauthorized")
+	}
+
+	// Reverse the balance effect
+	account, err := s.accountRepo.GetByID(ctx, existing.AccountID)
+	if err != nil {
+		return fmt.Errorf("account not found: %w", err)
+	}
+
+	newBalance := account.Balance
+	if existing.Type == domain.TransactionTypeCredit {
+		newBalance -= existing.Amount
+	} else {
+		newBalance += existing.Amount
+	}
+
+	if err := s.accountRepo.UpdateBalance(ctx, account.ID, newBalance); err != nil {
+		return fmt.Errorf("updating balance: %w", err)
+	}
+
+	if err := s.txRepo.Delete(ctx, txID); err != nil {
+		return fmt.Errorf("deleting transaction: %w", err)
+	}
+
+	s.cache.Delete(ctx, txListKey(userID), summaryKey(userID), accountListKey(userID))
+	return nil
+}

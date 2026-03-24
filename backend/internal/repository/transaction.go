@@ -38,6 +38,36 @@ func (r *transactionRepository) GetByID(ctx context.Context, id string) (*domain
 	return &tx, nil
 }
 
+func (r *transactionRepository) Update(ctx context.Context, tx *domain.Transaction) error {
+	query := `
+		UPDATE transactions
+		SET amount = $1, type = $2, category = $3, description = $4, merchant_name = $5
+		WHERE id = $6 AND user_id = $7
+	`
+	result, err := r.db.ExecContext(ctx, query,
+		tx.Amount, tx.Type, tx.Category, tx.Description, tx.MerchantName, tx.ID, tx.UserID)
+	if err != nil {
+		return fmt.Errorf("updating transaction: %w", err)
+	}
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("transaction not found or unauthorized")
+	}
+	return nil
+}
+
+func (r *transactionRepository) Delete(ctx context.Context, id string) error {
+	result, err := r.db.ExecContext(ctx, `DELETE FROM transactions WHERE id = $1`, id)
+	if err != nil {
+		return fmt.Errorf("deleting transaction: %w", err)
+	}
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("transaction not found")
+	}
+	return nil
+}
+
 func (r *transactionRepository) ListByUserID(ctx context.Context, userID string, limit, offset int) ([]*domain.Transaction, error) {
 	var txs []*domain.Transaction
 	query := `
