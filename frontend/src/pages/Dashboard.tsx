@@ -180,9 +180,15 @@ export default function Dashboard() {
                 <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
-                  labelStyle={{ color: '#e2e2f0', fontSize: 12 }}
-                  itemStyle={{ fontSize: 12 }}
+                  contentStyle={{
+                    background: '#1c1c28',
+                    border: '1px solid #7c6af7',
+                    borderRadius: '12px',
+                    padding: '10px 14px',
+                  }}
+                  labelStyle={{ color: '#ffffff', fontSize: 13, fontWeight: 600, marginBottom: 4 }}
+                  itemStyle={{ color: '#e2e2f0', fontSize: 12 }}
+                  formatter={(v: number) => formatCurrency(v)}
                 />
                 <Area type="monotone" dataKey="total_credit" name="Income" stroke="#2dd4a0" fill="url(#colorCredit)" strokeWidth={2} dot={false} />
                 <Area type="monotone" dataKey="total_debit" name="Expenses" stroke="#7c6af7" fill="url(#colorDebit)" strokeWidth={2} dot={false} />
@@ -216,9 +222,18 @@ export default function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
-                  formatter={(v: number) => formatCurrency(v)}
-                  itemStyle={{ fontSize: 12 }}
+                  contentStyle={{
+                    background: '#1c1c28',
+                    border: '1px solid #7c6af7',
+                    borderRadius: '12px',
+                    padding: '10px 14px',
+                  }}
+                  labelStyle={{ color: '#ffffff', fontSize: 13, fontWeight: 600, marginBottom: 4 }}
+                  itemStyle={{ color: '#e2e2f0', fontSize: 12 }}
+                  formatter={(v: number, name: string) => [
+                    formatCurrency(v),
+                    name.charAt(0).toUpperCase() + name.slice(1),
+                  ]}
                 />
                 <Legend
                   iconType="circle"

@@ -7,6 +7,18 @@ import {
 import { formatCurrency, CATEGORY_COLORS, CATEGORY_ICONS } from '@/lib/format'
 import { TrendingUp, TrendingDown, BarChart2 } from 'lucide-react'
 
+const tooltipStyle = {
+  contentStyle: {
+    background: '#1c1c28',
+    border: '1px solid #7c6af7',
+    borderRadius: '12px',
+    padding: '10px 14px',
+  },
+  labelStyle: { color: '#ffffff', fontSize: 13, fontWeight: 600, marginBottom: 4 },
+  itemStyle: { color: '#e2e2f0', fontSize: 12 },
+  cursor: { fill: 'rgba(124,106,247,0.08)' },
+}
+
 export default function AnalyticsPage() {
   const { summary, loading } = useSummary()
 
@@ -60,9 +72,11 @@ export default function AnalyticsPage() {
               <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
+                contentStyle={tooltipStyle.contentStyle}
+                labelStyle={tooltipStyle.labelStyle}
+                itemStyle={tooltipStyle.itemStyle}
+                cursor={tooltipStyle.cursor}
                 formatter={(v: number) => formatCurrency(v)}
-                itemStyle={{ fontSize: 12 }}
               />
               <Legend
                 iconType="circle"
@@ -92,9 +106,10 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
+                  contentStyle={tooltipStyle.contentStyle}
+                  labelStyle={tooltipStyle.labelStyle}
+                  itemStyle={tooltipStyle.itemStyle}
                   formatter={(v: number) => [formatCurrency(v), 'Net Flow']}
-                  itemStyle={{ fontSize: 12 }}
                 />
                 <Line
                   type="monotone"
@@ -123,7 +138,7 @@ export default function AnalyticsPage() {
                 <PolarGrid stroke="#252534" />
                 <PolarAngleAxis
                   dataKey="subject"
-                  tick={{ fill: '#6b7280', fontSize: 10 }}
+                  tick={{ fill: '#9ca3af', fontSize: 10 }}
                 />
                 <Radar
                   name="Spending"
@@ -134,9 +149,10 @@ export default function AnalyticsPage() {
                   strokeWidth={2}
                 />
                 <Tooltip
-                  contentStyle={{ background: '#16161f', border: '1px solid #252534', borderRadius: '12px' }}
+                  contentStyle={tooltipStyle.contentStyle}
+                  labelStyle={tooltipStyle.labelStyle}
+                  itemStyle={tooltipStyle.itemStyle}
                   formatter={(v: number) => [formatCurrency(v), 'Spent']}
-                  itemStyle={{ fontSize: 12 }}
                 />
               </RadarChart>
             </ResponsiveContainer>
