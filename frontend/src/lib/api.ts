@@ -20,7 +20,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only redirect to login on 401 if user is already logged in
+    // Don't redirect during login/register attempts
+    const isAuthRoute = error.config?.url?.includes('/auth/')
+    if (error.response?.status === 401 && !isAuthRoute) {
       localStorage.removeItem('fintrack_token')
       localStorage.removeItem('fintrack_user')
       window.location.href = '/login'
